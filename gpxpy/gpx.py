@@ -834,6 +834,8 @@ class GPXTrackSegment:
         moving_distance = 0.
         stopped_distance = 0.
 
+        max_speed = 0.
+
         speeds_and_distances = []
 
         for i in range(1, len(self.points)):
@@ -869,9 +871,16 @@ class GPXTrackSegment:
                     if distance and moving_time:
                         speeds_and_distances.append((distance / mod_utils.total_seconds(timedelta), distance, ))
 
-        max_speed = None
-        if speeds_and_distances:
-            max_speed = mod_geo.calculate_max_speed(speeds_and_distances)
+                if point.speed is not None:
+                    if point.speed > max_speed:
+                        max_speed = point.speed
+                else:
+                    speed_tmp = point.speed_between(previous)
+                    if speed_tmp > max_speed:
+                        max_speed = speed_tmp
+        # max_speed = None
+        # if speeds_and_distances:
+        #     max_speed = mod_geo.calculate_max_speed(speeds_and_distances)
 
         return MovingData(moving_time, stopped_time, moving_distance, stopped_distance, max_speed)
 
